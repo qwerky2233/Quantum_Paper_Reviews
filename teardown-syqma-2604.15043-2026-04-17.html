@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teardown: SyQMA — Symbolic QEC Simulator | arXiv 2604.15043</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f5f0e8;
+    --accent: #c0392b;
+    --muted: #5a5046;
+    --rule: #c8bfad;
+    --code-bg: #ede8de;
+    --tag-bg: #e3ddd1;
+    --score-bar: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    padding: 0 1rem;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 4rem 0 6rem;
+  }
+
+  /* ── Header ── */
+  .masthead {
+    border-top: 4px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding: 1rem 0 0.75rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .masthead-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+
+  .masthead-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    line-height: 1.15;
+    font-weight: 700;
+    margin: 1.25rem 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.5;
+  }
+
+  /* ── Verdict strip ── */
+  .verdict-strip {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 1.5rem;
+    margin: 0 -1.5rem 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 560px) {
+    .verdict-strip { grid-template-columns: 1fr; margin: 0 -1rem 2rem; }
+  }
+
+  .verdict-cell .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #a09580;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .verdict-cell .text {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--paper);
+  }
+
+  .verdict-cell .text.accent { color: #e8a090; }
+
+  /* ── Tags ── */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    background: var(--tag-bg);
+    color: var(--muted);
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--rule);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Paper info ── */
+  .paper-info {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem;
+    margin-bottom: 3rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .paper-info a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .paper-info a:hover { opacity: 0.75; }
+
+  /* ── Section headers ── */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 2.75rem 0 0.9rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--rule);
+    letter-spacing: -0.01em;
+  }
+
+  h2 .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  p {
+    margin-bottom: 1.1rem;
+  }
+
+  strong { font-weight: 600; }
+
+  em { font-style: italic; }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border: 1px solid var(--rule);
+  }
+
+  /* ── Pull quote ── */
+  .pull {
+    border-left: 4px solid var(--accent);
+    padding: 0.75rem 1.25rem;
+    margin: 2rem 0;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--muted);
+    background: var(--code-bg);
+  }
+
+  /* ── Scores table ── */
+  .scores {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 2rem;
+    font-size: 0.92rem;
+  }
+
+  .scores th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--ink);
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .scores td {
+    padding: 0.65rem 0.75rem 0.65rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .scores td:first-child {
+    font-weight: 600;
+    width: 34%;
+    white-space: nowrap;
+  }
+
+  .score-display {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .score-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 2ch;
+  }
+
+  .score-bar-wrap {
+    flex: 1;
+    height: 5px;
+    background: var(--rule);
+    max-width: 80px;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    background: var(--score-bar);
+  }
+
+  /* ── Footer rule ── */
+  .footer-rule {
+    border: none;
+    border-top: 4px solid var(--ink);
+    margin: 4rem 0 1.5rem;
+  }
+
+  .footer-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .footer-note a {
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <span class="masthead-label">Quantum Paper Teardown</span>
+    <span class="masthead-date">17 April 2026</span>
+  </div>
+
+  <h1>SyQMA: Exact Symbolic Simulation for QEC Gadgets</h1>
+  <p class="subtitle">A mechanism-first analysis of arXiv 2604.15043 — what it enables, how it works, and where the hype will land wrong.</p>
+
+  <!-- Verdict strip -->
+  <div class="verdict-strip">
+    <div class="verdict-cell">
+      <span class="label">Thesis</span>
+      <span class="text">Extending the stabilizer tableau with auxiliary qubits for non-Clifford rotations and Pauli noise channels enables exact, symbolic, polynomial-memory simulation of universal QEC gadgets — including magic state preparation — without Monte Carlo approximation.</span>
+    </div>
+    <div class="verdict-cell">
+      <span class="label">Verdict</span>
+      <span class="text accent">It works, and the first claim is real. But the scope is deliberately narrow: this is a gadget-level protocol verification tool, not a production QEC simulator. Miss that distinction and you'll overprice or dismiss it.</span>
+    </div>
+  </div>
+
+  <!-- Tags -->
+  <div class="tags">
+    <span class="tag">error-correction</span>
+    <span class="tag">simulation</span>
+    <span class="tag">magic-state-preparation</span>
+    <span class="tag">fault-tolerance</span>
+    <span class="tag">stabilizer-formalism</span>
+    <span class="tag">symbolic-computation</span>
+    <span class="tag">decoder-evaluation</span>
+  </div>
+
+  <!-- Paper info -->
+  <div class="paper-info">
+    <strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.15043" target="_blank">2604.15043</a><br>
+    <strong>Date:</strong> 16 April 2026<br>
+    <strong>Title:</strong> SyQMA: A memory-efficient, symbolic and exact universal simulator for quantum error correction<br>
+    <strong>Authors:</strong> George Umbrarescu, David Amaro (Quantinuum)<br>
+    <strong>Code:</strong> <a href="https://github.com/Quantinuum/SyQMA" target="_blank">github.com/Quantinuum/SyQMA</a> (open-source)
+  </div>
+
+  <!-- Section 1 -->
+  <h2><span class="num">01 —</span> What the Paper Claims</h2>
+  <p>SyQMA introduces a simulator that handles the combination that existing tools cannot: universal circuits (including non-Clifford gates), exact incoherent Pauli noise, symbolic output over noise rates and measurement outcomes, and dynamic circuits with classical feedforward — all within polynomial memory. The core QEC payoff is twofold: (1) it can compute circuit-level maximum-likelihood (CL-ML) decoder lookup tables as closed-form analytic functions of noise parameters, computed once and reusable; and (2) it is described as the <strong>first tool capable of determining the circuit-level fault distance of a non-Clifford circuit</strong>, such as magic state preparation. The paper applies SyQMA to Iceberg <code>[k+2,k,2]</code>, Steane <code>[7,1,3]</code>, Reed-Müller <code>[15,1,3]</code>, and <code>[17,1,5]</code> colour codes, reporting exact logical error rates (LERs) as low as <code>10⁻¹⁵</code> — a regime completely inaccessible to standard Monte Carlo methods.</p>
+
+  <!-- Section 2 -->
+  <h2><span class="num">02 —</span> Mechanism in Plain Language</h2>
+  <p>Standard stabilizer simulation (e.g. Stim) works by tracking a tableau of commuting Pauli operators that describe the quantum state. It is fast and scales well, but it only handles Clifford operations — gates like CNOT and Hadamard. Non-Clifford gates (T gates, arbitrary rotations) and realistic noise channels break the Clifford structure and have historically forced a choice between approximate methods or exponential memory cost.</p>
+
+  <p>SyQMA's key move is to introduce an auxiliary qubit for every non-Clifford operation. For each arbitrary-angle Pauli rotation, a <strong>rotation qubit</strong> is added; for each Pauli noise channel, a <strong>flip qubit</strong> is added. New operators — called <strong>COS operators</strong> (C, O, S) and <strong>flip operators</strong> (F) — act on these auxiliary qubits. A modified trace replaces the standard trace: rather than summing over the standard Pauli basis, it integrates out the auxiliary qubits weighted by cosines, sines, and noise flip-factors. This is not approximation — the non-Clifford and noise content is absorbed exactly into the auxiliary structure. What remains in the tableau is still Clifford-compatible and can be evolved in polynomial time and memory.</p>
+
+  <p>The cost surfaces when you ask for information: computing an expectation value or measurement probability requires summing over 2<sup>|T<sub>R</sub>|+|T<sub>F</sub>|</sup> terms, where <code>T_R</code> is the set of rotation qubits that actually contributed to the exponential structure and <code>T_F</code> is bounded by the number of deterministic projections that noise makes non-deterministic. Crucially, each term in that sum is independent — they can be computed one at a time with no exponential memory overhead, just exponential time. The authors show that in practice this set is far smaller than the total number of non-Clifford gates, because many rotations get absorbed into <code>T_Q</code> via Gaussian elimination and do not blow up the cost.</p>
+
+  <div class="pull">
+    The insight: make non-Clifford gates "look Clifford" by injecting them from auxiliary qubits with a modified trace. You pay in runtime, not memory.
+  </div>
+
+  <!-- Section 3 -->
+  <h2><span class="num">03 —</span> What Matters Practically</h2>
+  <p><strong>Stack layer most affected: QEC gadget design and protocol verification</strong> — the layer between physical hardware characterization and full fault-tolerant algorithm planning. SyQMA is not a hardware simulation tool and it is not a large-scale circuit simulator. Its home is the workbench where a QEC team is analyzing a specific state-preparation circuit, a flag protocol, or a magic state cultivation stage.</p>
+
+  <p><strong>Decoder evaluation:</strong> The CL-ML lookup tables SyQMA produces are exact and symbolic — they are analytic expressions in the noise rate <code>p</code>, not tables re-computed per noise point. This means syndrome-by-syndrome decode reliability is available as a continuous function of noise. For near-term hardware experiments with known noise models, these LUTs could be precomputed and deployed directly to on-device classical control. The paper demonstrates this concretely: at <code>p = 10⁻³</code> on the Steane code, SyQMA identifies that eliminating syndromes with expectation values in <code>[−0.1, 0.1]</code> reduces LER by ~10% while affecting fewer than one-in-a-million acceptance events.</p>
+
+  <p><strong>Non-Clifford fault-distance verification:</strong> Before SyQMA, verifying that a magic state preparation circuit preserves code distance required either approximate simulation or falling back to Pauli propagation tools that couldn't track measurement outcomes symbolically. SyQMA directly confirms the fault distance by reading the leading-order Taylor coefficient of the symbolic LER — a unique capability that matters for validating new cultivation and distillation protocols at small code sizes before scaling.</p>
+
+  <p><strong>Feasibility assessment:</strong> The polynomial memory profile means SyQMA can be used on a workstation for circuits with ~15–20 non-Clifford gates and dozens of physical qubits — the regime of Steane and small colour code gadgets — without specialized hardware. This is sufficient for most early-stage protocol certification workflows.</p>
+
+  <!-- Section 4 -->
+  <h2><span class="num">04 —</span> Likely Misinterpretation</h2>
+  <p>The combination of <em>"universal simulator"</em> + <em>"polynomial memory"</em> will be misread as a Stim-class tool that simply adds symbolic output. It is not. Runtime is exponential in the number of non-Clifford rotations that escape Gaussian elimination into the tableau's rotation set — and the paper is explicit that this tool targets "small to moderate" circuits, not production-scale QEC stacks with thousands of T gates per logical cycle. Using it for surface code memory simulations or magic state distillation at even intermediate scale would be computationally prohibitive.</p>
+
+  <p>The "polynomial memory" headline will also be misread. Memory is polynomial in circuit size when you hold only one or two noise rate parameters symbolically. The moment you keep more symbolic parameters — to map out a joint noise landscape, for instance — memory scales exponentially in the number of parameters retained. This is a deliberate design choice, not a gap, but it limits the tool's use in multi-parameter noise model fitting workflows without Taylor truncation.</p>
+
+  <p>Finally, because this comes from Quantinuum, and the Iceberg code featured prominently is Quantinuum-native, there's a risk of reading it as hardware-specific rather than code-agnostic. The framework is general — it works on any stabilizer code and any noise model expressible as Pauli channels — but the examples are naturally shaped by what's near-term relevant to the authors.</p>
+
+  <!-- Section 5 -->
+  <h2><span class="num">05 —</span> Bottom Line</h2>
+  <p>SyQMA fills a real gap: exact, symbolic fault-distance verification and decoder evaluation for non-Clifford QEC gadgets, in polynomial memory, with no Monte Carlo noise on the LER. The mechanism is sound, the open-source code is available now, and the first claim — that this can compute circuit-level fault distance for magic state preparation — is credible and previously unmet. Keep it on the workbench, not in the simulation pipeline. If you are building or evaluating small fault-tolerant protocols, especially involving magic state cultivation or flag-based state preparation, run your circuits through SyQMA before committing to a noise model or decoder architecture.</p>
+
+  <!-- Scores -->
+  <h2><span class="num">06 —</span> Scores</h2>
+  <table class="scores">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Score</th>
+        <th>Rationale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Technical significance</td>
+        <td>
+          <div class="score-display">
+            <span class="score-num">4/5</span>
+            <div class="score-bar-wrap"><div class="score-bar-fill" style="width:80%"></div></div>
+          </div>
+        </td>
+        <td>Genuinely novel mechanism — injecting non-Clifford operations via auxiliary qubits into a Clifford tableau with a modified trace is a clean idea with real consequences. The Pauli channel decomposition via Walsh-Hadamard (exact factorization into independent flip channels) is a standalone contribution of independent value for DEM construction. Loses one point because runtime scaling will cap practical reach.</td>
+      </tr>
+      <tr>
+        <td>Industrial relevance</td>
+        <td>
+          <div class="score-display">
+            <span class="score-num">3/5</span>
+            <div class="score-bar-wrap"><div class="score-bar-fill" style="width:60%"></div></div>
+          </div>
+        </td>
+        <td>High relevance for small teams doing precise gadget-level QEC protocol certification — particularly magic state cultivation and flag protocols. Limited relevance for large-scale QEC hardware teams needing throughput simulation. The exact CL-ML LUT output is immediately actionable for near-term hardware experiments with known noise models.</td>
+      </tr>
+      <tr>
+        <td>Misinterpretation risk</td>
+        <td>
+          <div class="score-display">
+            <span class="score-num">4/5</span>
+            <div class="score-bar-wrap"><div class="score-bar-fill" style="width:80%"></div></div>
+          </div>
+        </td>
+        <td>"Universal simulator with polynomial memory" is a high-risk phrase. The caveats on exponential runtime and the small-circuit assumption are present in the paper but will be lost in secondary citations. The non-Clifford fault-distance claim — the strongest and most novel — will be under-read, while the memory claim will be over-read.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Verification -->
+  <h2><span class="num">07 —</span> Verification</h2>
+  <div class="paper-info">
+    <strong>Public post URL:</strong> This document (teardown-syqma-2604.15043-2026-04-17.html)<br>
+    <strong>arXiv source:</strong> <a href="https://arxiv.org/abs/2604.15043" target="_blank">arxiv.org/abs/2604.15043</a><br>
+    <strong>Source code:</strong> <a href="https://github.com/Quantinuum/SyQMA" target="_blank">github.com/Quantinuum/SyQMA</a><br>
+    <strong>Teardown date:</strong> 17 April 2026<br>
+    <strong>Synthesis tags:</strong> QEC-realism, tooling-trends, non-Clifford-simulation, gadget-verification
+  </div>
+
+  <hr class="footer-rule">
+  <p class="footer-note">
+    Teardown written against arXiv:2604.15043v1 (Umbrarescu &amp; Amaro, Quantinuum, April 2026).
+    Analysis is qualitative first-pass; no code execution or reproduction performed.
+    Feeds synthesis on QEC tooling trends and realism in fault-tolerance feasibility assessment.
+  </p>
+
+</div>
+</body>
+</html>
