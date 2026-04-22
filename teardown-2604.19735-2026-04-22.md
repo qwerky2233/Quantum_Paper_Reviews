@@ -18,8 +18,9 @@ The architectural diagnosis is solid and timely; the proposed teleportation sche
 
 - **arXiv link:** https://arxiv.org/abs/2604.19735
 - **Date:** April 22, 2026
-- **Title:** *(Title not yet indexed; paper concerns teleportation-based parallelization of logical operations for early fault-tolerant neutral atom architectures)*
-- **Authors:** *(Not yet indexed)*
+- **Title:** Architecting Early Fault Tolerant Neutral Atoms
+Systems with Quantum Advantage
+- **Authors:** K. Brown et. al.
 
 ---
 
